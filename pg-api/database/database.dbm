@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+         Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="0.9.1-beta" last-position="0,117" last-zoom="1"
+	 default-schema="public" default-owner="postgres">
+<database name="new_database">
+</database>
+
+<schema name="public" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<table name="sensor">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="300" y="180"/>
+	<column name="id_sensor" not-null="true">
+		<type name="serial" length="0"/>
+	</column>
+	<column name="ultima_medida">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="localizacao">
+		<type name="varchar" length="0"/>
+	</column>
+	<constraint name="pk_sensor" type="pk-constr" table="public.sensor">
+		<columns names="id_sensor" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="id_bateria" index="6"/>
+		<object name="id_marca" index="5"/>
+		<object name="id_tamanho" index="3"/>
+		<object name="id_tipo" index="4"/>
+	</customidxs>
+
+	<customidxs object-type="constraint">
+		<object name="bateria_fk" index="4"/>
+		<object name="marca_fk" index="3"/>
+		<object name="tamanho_fk" index="1"/>
+		<object name="tipo_fk" index="2"/>
+	</customidxs>
+</table>
+
+<table name="marca">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="0" y="420"/>
+	<column name="id_marca" not-null="true">
+		<type name="serial" length="0"/>
+	</column>
+	<column name="nm_marca">
+		<type name="varchar" length="0"/>
+	</column>
+	<constraint name="pk_marca" type="pk-constr" table="public.marca">
+		<columns names="id_marca" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="tipo">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="720" y="440"/>
+	<column name="id_tipo" not-null="true">
+		<type name="serial" length="0"/>
+	</column>
+	<column name="nm_tipo">
+		<type name="varchar" length="0"/>
+	</column>
+	<constraint name="pk_tipo" type="pk-constr" table="public.tipo">
+		<columns names="id_tipo" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="bateria">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="0" y="40"/>
+	<column name="id_bateria" not-null="true">
+		<type name="serial" length="0"/>
+	</column>
+	<column name="tensao">
+		<type name="double precision" length="0"/>
+	</column>
+	<constraint name="pk_bateria" type="pk-constr" table="public.bateria">
+		<columns names="id_bateria" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="tamanho">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="700" y="40"/>
+	<column name="id_tamanho" not-null="true">
+		<type name="serial" length="0"/>
+	</column>
+	<column name="altura">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="largura">
+		<type name="double precision" length="0"/>
+	</column>
+	<column name="comprimento">
+		<type name="double precision" length="0"/>
+	</column>
+	<constraint name="pk_tamanho" type="pk-constr" table="public.tamanho">
+		<columns names="id_tamanho" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<relationship name="sensor_has_tamanho" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#772dfc"
+	 src-table="public.tamanho"
+	 dst-table="public.sensor"
+	 src-required="true" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+</relationship>
+
+<relationship name="sensor_has_type" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#e6ee2f"
+	 src-table="public.tipo"
+	 dst-table="public.sensor"
+	 src-required="true" dst-required="false"/>
+
+<relationship name="sensor_has_marca" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#79f2fd"
+	 src-table="public.marca"
+	 dst-table="public.sensor"
+	 src-required="true" dst-required="false"/>
+
+<relationship name="sensor_has_bateria" type="rel1n"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#c6d7e7"
+	 src-table="public.bateria"
+	 dst-table="public.sensor"
+	 src-required="true" dst-required="false"/>
+
+</dbmodel>
