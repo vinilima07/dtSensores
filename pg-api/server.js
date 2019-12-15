@@ -10,50 +10,206 @@ var config = {
   password: '',
   user: 'postgres',
   host: 'localhost',
-  database: 'sensores'
+  database: 'sensores',
+  max: 100
 }
 let pool = new pg.Pool(config)
-
-function exec_query(query){
-  pool.connect((err, db, done) => {
-    if(err){
-      return console.log(err)
-    }
-    db.query(query, (err, result) => {
-      done()
-      if(err){
-        return console.log(err)
-      }else{
-        console.log(result.rows)
-        return result.rows
-      }
-    })
-  })
-}
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended:true }))
 app.use(morgan('dev'))
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "YOUR-DOMAIN.TLD") // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Origin", "*") // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
   next()
 })
 
 app.listen(PORT, () => console.log('Listening on port ' + PORT))
 
-app.get(['/', '/sensores'], function() {
-  
+let get_tamanho = 'SELECT * FROM tamanho;';
+let get_marca = 'SELECT * FROM marca;';
+let get_tipo = 'SELECT * FROM tipo;';
+let get_bateria = 'SELECT * FROM bateria;';
+let get_sensores =
+  'SELECT id_sensor, ultima_medida, localizacao, largura,' +
+  'altura, comprimento, nm_marca, nm_tipo, tensao ' +
+  'FROM sensor ' +
+  'NATURAL JOIN tamanho ' +
+  'NATURAL JOIN marca ' +
+  'NATURAL JOIN tipo ' +
+  'NATURAL JOIN bateria;'
+;
+let new_sensor =
+  'INSERT INTO sensor (localizacao, ultima_medida,' +
+  'id_tamanho, id_tipo, id_marca, id_bateria) ' +
+  'VALUES($1, $2, $3, $4, $5, $6);'
+;
+let delete_sensor =  'DELETE FROM sensor WHERE id_sensor = $1;';
+
+app.get(['/', '/sensores'], function(request, response) {
+  pool.connect((err, db, done) => {
+    if(err){
+      return response.status(400).send(err)
+    }
+    db.query(get_sensores, (err, result) => {
+      done()
+      if(err){
+        console.log(err);
+        return response.status(400).send(err)
+      }else{
+        return response.status(200).send(result.rows)
+      }
+    })
+  })
 })
 
-app.post('/cadastrar_sensor', function() {
-
+app.get('/cadastrar_sensor', function(request, response) {
+  pool.connect((err, db, done) => {
+    if(err){
+      return response.status(400).send(err)
+    }
+    db.query(get_tamanho+get_tipo+get_marca+get_bateria, (err, results) => {
+      done()
+      if(err){
+        return response.status(400).send(err)
+      }else{
+        return response.status(200).send(
+          {
+            tamanhos: results[0].rows,
+            tipos: results[1].rows,
+            marcas: results[2].rows,
+            baterias: results[3].rows
+          })
+      }
+    })
+  })
 })
 
-app.post('/atualizar_sensor', function() {
+app.post('/cadastrar_sensor', function(request, response) {
+  let localizacao = null
+  let ultima_medida = null
+  if(request.body.localizacao != '')
+    localizacao = request.body.localizacao
+  if(request.body.ultima_medida != '')
+    ultima_medida = parseFloat(request.body.ultima_medida)
 
+  pool.connect((err, db, done) => {
+    if(err){
+      return response.status(400).send(err)
+    }
+    db.query(new_sensor, [
+      localizacao, ultima_medida,
+      request.body.id_tamanho, request.body.id_tipo,
+      request.body.id_marca, request.body.id_bateria],
+      (err, result) => {
+      done()
+      if(err){
+        console.log('Deu erro');
+        console.log(err);
+        return response.status(400).send(err)
+      }else{
+        console.log('Funcionou');
+        return response.status(201).send({msg: true})
+      }
+    })
+  })
 })
 
-app.get('/remover_sensor', function() {
+app.get('/atualizar_sensor', function(request, response) {
+  pool.connect((err, db, done) => {
+    if(err){
+      return response.status(400).send(err)
+    }
+    db.query(get_tamanho+get_tipo+get_marca+get_bateria+get_sensores, (err, results) => {
+      done()
+      if(err){
+        return response.status(400).send(err)
+      }else{
+        return response.status(200).send(
+          {
+            tamanhos: results[0].rows,
+            tipos: results[1].rows,
+            marcas: results[2].rows,
+            baterias: results[3].rows,
+            sensores: results[4].rows
+          })
+      }
+    })
+  })
+})
 
+app.post('/atualizar_sensor', function(request, response) {
+  let id_sensor = request.body.id_sensor
+  let query = ""
+  let values = []
+  let statements = []
+
+  if(request.body.localizacao != ''){
+    values.push(request.body.localizacao)
+    statements.push('localizacao')
+  }
+  if(request.body.ultima_medida != ''){
+    values.push(request.body.ultima_medida)
+    statements.push('ultima_medida')
+  }
+  if(request.body.id_tamanho != ''){
+    values.push(request.body.id_tamanho)
+    statements.push('id_tamanho')
+  }
+  if(request.body.id_tipo != ''){
+    values.push(request.body.id_tipo)
+    statements.push('id_tipo')
+  }
+  if(request.body.id_marca != ''){
+    values.push(request.body.id_marca)
+    statements.push('id_marca')
+  }
+  if(request.body.id_bateria != ''){
+    values.push(request.body.id_bateria)
+    statements.push('id_bateria')
+  }
+
+  for(let i=0; i<statements.length; i++){
+      query += statements[i]+'='+values[i]+','
+  }
+  query = query.substring(0, query.length - 1);
+
+  pool.connect((err, db, done) => {
+    if(err){
+      return response.status(400).send(err)
+    }
+    db.query(
+      'UPDATE sensor SET ' + query +
+      ' WHERE id_sensor = '+ id_sensor,
+      (err, result) => {
+      done()
+      if(err){
+        console.log('Deu erro');
+        console.log(err);
+        return response.status(400).send(err)
+      }else{
+        console.log('Funcionou');
+        return response.status(201).send({msg: true})
+      }
+    })
+  })
+})
+
+app.post('/deletar_sensor', function(request, response) {
+  console.log('tentou deletar');
+  var id_sensor = parseFloat(request.body.id_sensor)
+  pool.connect((err, db, done) => {
+    if(err){
+      return response.status(400).send(err)
+    }
+    db.query(delete_sensor, [id_sensor], (err, result) => {
+      done()
+      if(err){
+        console.log(err);
+        return response.status(400).send(err)
+      }else{
+        return response.status(201).send({msg: true})
+      }
+    })
+  })
 })

@@ -1,5 +1,14 @@
-#view {
-  padding-top: 4em !important;
+ul li {
+  padding-left: 15px;
+}
+
+.view, table {
+  overflow: auto;
+  max-height: 350px !important;
+}
+
+.content-fluid {
+  padding-bottom: 7em !important;
 }
 
 .row {

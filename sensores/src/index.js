@@ -1,45 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './static/vendor/bootstrap/css/bootstrap.min.css';
 import './static/sketch.css';
 import * as serviceWorker from './serviceWorker';
 import * as pages from './pages.js';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+} from "react-router-dom";
+//let DOMAIN = 'http://localhost:4000';
 
 class App extends React.Component {
   constructor() {
     super()
     this.state = {
-      page: 0
-    }
-  }
-
-  setPage(event){
-    console.log(this.page);
-    this.page = 1
-    console.log(this.page);
-  }
-
-  managePage(){
-    switch (this.page) {
-      case 1:
-        return <pages.CadastraSensor />
-      break;
-      case 2:
-        return <pages.AtualizaSensor />
-      break;
-      case 3:
-        return <pages.DeletaSensor />
-      break;
-      default:
-        return <pages.VisualizaSensor />
     }
   }
 
   render() {
     return (
       <div className="App">
-        <Navbar setPage={ this.setPage }/>
-        <Content managePage={ this.managePage }/>
+        <Router>
+          <Navbar />
+          <Content />
+        </Router>
         <Footer />
       </div>
     )
@@ -52,7 +37,7 @@ class Navbar extends React.Component {
 		this.state = {
       brand: '.dtSensores',
       navegador: ['Exibir Sensores', 'Cadastrar Sensor',
-                'Atualizar Sensor', 'Remover Sensor']
+                'Atualizar Sensor', 'Deletar Sensor']
 		}
 	}
 
@@ -60,28 +45,21 @@ class Navbar extends React.Component {
     let brand = this.state.brand
     let navegador = this.state.navegador
     return(
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <a className="navbar-brand" href="/">{ brand }</a>
         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse d-flex justify-content-end" id="navbarSupportedContent">
-          <ul className="navbar-nav mr-auto d-flex justify-content-end">
+          <ul className="navbar-nav ml-auto d-flex justify-content-end">
             <li className="nav-item">
-              <a onClick={this.props.setPage.bind(this)}
-              className="nav-link" href="sensores">{ navegador[0] }</a>
+              <Link className="nav-link" to="/">{ navegador[0] }</Link>
             </li>
             <li className="nav-item">
-              <a onClick={this.props.setPage.bind(this)}
-              className="nav-link" href="cadastrar_sensor">{ navegador[1] }</a>
+              <Link className="nav-link" to="/cadastrar_sensor">{ navegador[1] }</Link>
             </li>
             <li className="nav-item">
-              <a onClick={this.props.setPage.bind(this)}
-              className="nav-link" href="atualizar_sensor">{ navegador[2] }</a>
-            </li>
-            <li className="nav-item">
-              <a onClick={this.props.setPage.bind(this)}
-              className="nav-link" href="remover_sensor">{ navegador[3] }</a>
+              <Link className="nav-link" to="/atualizar_sensor">{ navegador[2] }</Link>
             </li>
           </ul>
         </div>
@@ -99,8 +77,18 @@ class Content extends React.Component {
 
   render() {
     return(
-      <div className="content-fluid" id="view">
-        { this.props.managePage() }
+      <div className="content-fluid py-2">
+        <Switch>
+          <Route path="/(sensores|)">
+            <pages.VisualizaSensor />
+          </Route>
+          <Route path="/cadastrar_sensor">
+            <pages.CadastraSensor />
+          </Route>
+          <Route path="/atualizar_sensor">
+            <pages.AtualizaSensor />
+          </Route>
+        </Switch>
       </div>
     )
   }
@@ -118,8 +106,8 @@ class Footer extends React.Component {
       <footer className="page-footer py-1 bg-dark fixed-bottom">
         <div id="footer-elements" className="container">
           <p className="m-0 text-center text-white">Digital Talents - CRUD Sensores</p>
-          <p className="m-0 text-center text-white">Vinicius França</p>
-          <p className="m-0 text-center text-white">2019</p>
+          <p className="m-0 text-center text-white">Vinicius França Lima Vilaça</p>
+          <p className="m-0 text-center text-white">viniciusfdev@gmail.com - 2019</p>
         </div>
       </footer>
     )
