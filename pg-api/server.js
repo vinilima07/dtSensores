@@ -3,28 +3,27 @@ let bodyParser = require('body-parser')
 let morgan = require('morgan')
 let pg = require('pg')
 let app = express()
-const PORT = 3000;
+const PORT = 4000;
 
 var config = {
   port: 5432,
   password: '',
   user: 'postgres',
   host: 'localhost',
-  database: 'dtSensores'
+  database: 'sensores'
 }
 let pool = new pg.Pool(config)
 
 function exec_query(query){
-  pool.connect((err, db, done){
+  pool.connect((err, db, done) => {
     if(err){
       return console.log(err)
     }
     db.query(query, (err, result) => {
-      release()
+      done()
       if(err){
-        console.log(err)
+        return console.log(err)
       }else{
-        console.log(result)
         console.log(result.rows)
         return result.rows
       }
@@ -42,3 +41,19 @@ app.use(function(req, res, next) {
 })
 
 app.listen(PORT, () => console.log('Listening on port ' + PORT))
+
+app.get(['/', '/sensores'], function() {
+  
+})
+
+app.post('/cadastrar_sensor', function() {
+
+})
+
+app.post('/atualizar_sensor', function() {
+
+})
+
+app.get('/remover_sensor', function() {
+
+})
