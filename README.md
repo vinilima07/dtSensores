@@ -1,4 +1,4 @@
-#Autho
+# Author
 Vinícius França Lima vilaça<br />
 e-mail: viniciusfdev@gmail.com
 
