@@ -1,5 +1,6 @@
 import React from 'react';
-let DOMAIN = 'http://localhost:4000';
+import './static/sketch.css';
+let DOMAIN = 'http://localhost:1777';
 
 export class VisualizaSensor extends React.Component {
 	constructor() {
@@ -21,6 +22,15 @@ export class VisualizaSensor extends React.Component {
       })
       }
     )
+		fetch(DOMAIN+'/sensores')
+    .then(response => response.json())
+    .then(data => {
+      this.setState({
+        isLoaded: true,
+        sensores: data
+      })
+      }
+    ).catch()
   }
 
   deletarSensor(id_sensor, event) {
@@ -40,7 +50,7 @@ export class VisualizaSensor extends React.Component {
       if(data.msg){
         alert('Sensor deletado com sucesso!')
         for(let i=0; i<this.state.sensores.length; i++){
-          if(this.state.sensores[i].id_sensor == id_sensor){
+          if(this.state.sensores[i].id_sensor === id_sensor){
             this.state.sensores.splice(i, 1)
             let items = this.state.sensores
             this.setState({
@@ -164,7 +174,7 @@ export class CadastraSensor extends React.Component {
       if(data.msg){
         alert('Sensor registrado com sucesso!')
       }
-      console.log(this.refs.formCadastro.reset())
+      this.refs.formCadastro.reset()
     })
   }
 
@@ -286,7 +296,7 @@ export class AtualizaSensor extends React.Component {
       if(data.msg){
         alert('Sensor atualizado com sucesso!')
       }
-      console.log(this.refs.formAtualizar.reset())
+      this.refs.formAtualizar.reset()
     })
   }
 

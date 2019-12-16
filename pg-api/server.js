@@ -3,16 +3,11 @@ let bodyParser = require('body-parser')
 let morgan = require('morgan')
 let pg = require('pg')
 let app = express()
-const PORT = 4000;
+let fs = require('fs')
+const PORT = 1777;
 
-var config = {
-  port: 5432,
-  password: '',
-  user: 'postgres',
-  host: 'localhost',
-  database: 'sensores',
-  max: 100
-}
+let config = fs.readFileSync('database/settings.json');
+config = (JSON.parse(config)).database
 let pool = new pg.Pool(config)
 
 app.use(bodyParser.json())
@@ -49,6 +44,7 @@ let delete_sensor =  'DELETE FROM sensor WHERE id_sensor = $1;';
 app.get(['/', '/sensores'], function(request, response) {
   pool.connect((err, db, done) => {
     if(err){
+      console.log(err);
       return response.status(400).send(err)
     }
     db.query(get_sensores, (err, result) => {
@@ -71,6 +67,7 @@ app.get('/cadastrar_sensor', function(request, response) {
     db.query(get_tamanho+get_tipo+get_marca+get_bateria, (err, results) => {
       done()
       if(err){
+        console.log(err);
         return response.status(400).send(err)
       }else{
         return response.status(200).send(
@@ -213,3 +210,24 @@ app.post('/deletar_sensor', function(request, response) {
     })
   })
 })
+
+process.stdin.resume();//so the program will not close instantly
+
+function exitHandler(options, exitCode) {
+    if (options.cleanup) console.log('clean');
+    if (exitCode || exitCode === 0) console.log(exitCode);
+    if (options.exit) process.exit();
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));

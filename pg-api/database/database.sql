@@ -1,14 +1,5 @@
 -- Model Author: Vinicius França
 
--- Database creation must be done outside an multicommand file.
--- These commands were put in this file only for convenience.
--- -- object: new_database | type: DATABASE --
--- -- DROP DATABASE IF EXISTS new_database;
--- CREATE DATABASE new_database
--- ;
--- -- ddl-end --
--- 
-
 -- object: public.sensor | type: TABLE --
 -- DROP TABLE IF EXISTS public.sensor CASCADE;
 CREATE TABLE public.sensor(
@@ -126,5 +117,3 @@ INSERT INTO public.tipo (nm_tipo) VALUES('Corrente Elétrica');
 INSERT INTO public.tipo (nm_tipo) VALUES('Pressão');
 INSERT INTO public.tipo (nm_tipo) VALUES('Intensidade Luminosa');
 INSERT INTO public.tipo (nm_tipo) VALUES('Aceleração');
-
-
