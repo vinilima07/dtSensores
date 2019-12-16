@@ -1,3 +1,7 @@
+#Autho
+Vinícius França Lima vilaça<br />
+e-mail: viniciusfdev@gmail.com
+
 # dtSensores
 CRUD de um sistema de gestão de sensores
 
